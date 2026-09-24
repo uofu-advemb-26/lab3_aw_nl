@@ -77,3 +77,5 @@ add_subdirectory(src)
 # The test configuration is inside the test directory.
 include(CTest)
 add_subdirectory(test)
+
+
