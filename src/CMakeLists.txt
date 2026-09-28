@@ -36,6 +36,7 @@ pico_add_extra_outputs(hello_freertos)
 # Threads ------
 add_executable(threads
     threads.c
+    threads_helper.c
     )
 
 

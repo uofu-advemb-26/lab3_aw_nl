@@ -5,11 +5,17 @@
 #include "unity_config.h"
 #include "threads.h"
 
+#include <FreeRTOS.h>
+#include <semphr.h>
+#include <task.h>
+
 int counter;
+SemaphoreHandle_t semaphore;
 
 void setUp(void) 
 {
     counter = 0;
+    semaphore = xSemaphoreCreateCounting(1, 1);
 }
 
 void tearDown(void) {}
@@ -23,7 +29,7 @@ void test_variable_assignment()
 void test_main_print(void)
 {
     int before = counter;
-    side_print(&counter);
+    inc_counter(&counter, semaphore);
     int after = counter;
     TEST_ASSERT_TRUE_MESSAGE(after == before + 1, "Side print failed");
 }
@@ -31,10 +37,12 @@ void test_main_print(void)
 void test_side_print(void)
 {
     int before = counter;
-    side_print(&counter);
+    inc_counter(&counter, semaphore);
     int after = counter;
     TEST_ASSERT_TRUE_MESSAGE(after == before + 1, "Side print failed");
 }
+
+
 
 int main (void)
 {
