@@ -3,8 +3,14 @@
 #include <stdint.h>
 #include <unity.h>
 #include "unity_config.h"
+#include "threads.h"
 
-void setUp(void) {}
+int counter;
+
+void setUp(void) 
+{
+    counter = 0;
+}
 
 void tearDown(void) {}
 
@@ -14,12 +20,20 @@ void test_variable_assignment()
     TEST_ASSERT_TRUE_MESSAGE(x == 1,"Variable assignment failed.");
 }
 
-void test_multiplication(void)
+void test_main_print(void)
 {
-    int x = 30;
-    int y = 6;
-    int z = x / y;
-    TEST_ASSERT_TRUE_MESSAGE(z == 5, "Multiplication of two integers returned incorrect value.");
+    int before = counter;
+    side_print(&counter);
+    int after = counter;
+    TEST_ASSERT_TRUE_MESSAGE(after == before + 1, "Side print failed");
+}
+
+void test_side_print(void)
+{
+    int before = counter;
+    side_print(&counter);
+    int after = counter;
+    TEST_ASSERT_TRUE_MESSAGE(after == before + 1, "Side print failed");
 }
 
 int main (void)

@@ -17,16 +17,30 @@ SemaphoreHandle_t semaphore;
 int counter;
 int on;
 
+void side_print(int *count)
+{
+    xSemaphoreTake(semaphore, portMAX_DELAY);
+    {
+        *count += 1;
+        printf("hello world from %s! Count %d\n", "thread", *count);
+    }
+    xSemaphoreGive(semaphore);
+}
+
+void main_print(int *count)
+{
+    xSemaphoreTake(semaphore, portMAX_DELAY);
+    {
+        printf("hello world from %s! Count %d\n", "main", (*count)++);
+    }
+    xSemaphoreGive(semaphore);
+}
+
 void side_thread(void *params)
 {
 	while (1) {
         vTaskDelay(100);
-        xSemaphoreTake(semaphore, portMAX_DELAY);
-        {
-            counter += 1;
-		    printf("hello world from %s! Count %d\n", "thread", counter);
-        }
-        xSemaphoreGive(semaphore);
+        side_print(&counter);
 	}
 }
 
@@ -35,11 +49,7 @@ void main_thread(void *params)
 	while (1) {
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);
         vTaskDelay(100);
-        xSemaphoreTake(semaphore, portMAX_DELAY);
-        {
-		    printf("hello world from %s! Count %d\n", "main", counter++);
-        }
-        xSemaphoreGive(semaphore);
+        main_print(&counter); 
         on = !on;
 	}
 }
