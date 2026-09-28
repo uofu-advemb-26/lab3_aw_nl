@@ -1,7 +1,7 @@
 #ifndef THREADS
 #define THREADS
 
-main_print(int *count);
-side_print(int *count);
+void main_print(int *count);
+void side_print(int *count);
 
 #endif

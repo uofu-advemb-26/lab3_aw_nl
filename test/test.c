@@ -44,7 +44,8 @@ int main (void)
         printf("Start tests\n");
         UNITY_BEGIN();
         RUN_TEST(test_variable_assignment);
-        RUN_TEST(test_multiplication);
+        RUN_TEST(test_side_print);
+        RUN_TEST(test_main_print);
         sleep_ms(5000);
         UNITY_END();
     }
