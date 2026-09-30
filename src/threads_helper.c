@@ -16,7 +16,7 @@ int inc_counter(int *count, SemaphoreHandle_t semaphore, TickType_t timeout, con
     return pdTRUE;
 }
 
-int two_locks(void *args)
+void two_locks(void *args)
 {
     struct DeadArgs *dead_args = (struct DeadArgs *)args;
 
@@ -34,5 +34,4 @@ int two_locks(void *args)
     }   
     xSemaphoreGive(dead_args->a);
     vTaskSuspend(NULL);
-    return pdTRUE;
 }
