@@ -12,6 +12,7 @@
 #include <task.h>
 
 #define MAIN_TASK_PRIORITY      ( tskIDLE_PRIORITY + 5UL )
+#define DEAD_TASK_PRIORITY      (MAIN_TASK_PRIORITY - 1UL)
 #define MAIN_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
 
 
@@ -75,8 +76,41 @@ void test_increment_semaphore_available(void)
     TEST_ASSERT_TRUE_MESSAGE(counter == 1, "Counter incremented incorrectly");
 }
 
+void test_deadlock(void)
+{
+
+    TaskHandle_t left_thread, right_thread;
+
+    SemaphoreHandle_t left_lock = xSemaphoreCreateCounting(1,1);
+    SemaphoreHandle_t right_lock = xSemaphoreCreateCounting(1,1);
+
+    struct DeadArgs left_args = {left_lock, right_lock, 0};
+    struct DeadArgs right_args = {right_lock, left_lock, 2};
 
 
+    xTaskCreate(two_locks, "DeadlockThread1",
+            MAIN_TASK_STACK_SIZE, &left_args, DEAD_TASK_PRIORITY, &left_thread);
+    xTaskCreate(two_locks, "DeadlockThread2",
+            MAIN_TASK_STACK_SIZE, &right_args, DEAD_TASK_PRIORITY, &right_thread);
+
+    printf("created threads");
+
+
+    vTaskDelay(1000);
+
+    // both semaphore counts should be 0
+    TEST_ASSERT_EQUAL_INT(uxSemaphoreGetCount(left_lock), 0);
+    TEST_ASSERT_EQUAL_INT(uxSemaphoreGetCount(right_lock), 0);
+
+    TEST_ASSERT_EQUAL_INT(0, left_args.counter);
+    TEST_ASSERT_EQUAL_INT(2, right_args.counter);
+
+    printf("kill threads");
+    vTaskDelete(left_thread);
+    vTaskDelete(right_thread);
+
+    printf("done");
+}
 
 void main_thread(void *params)
 {
@@ -90,6 +124,7 @@ void main_thread(void *params)
         RUN_TEST(test_main_print);
         RUN_TEST(test_increment_semaphore_taken);
         RUN_TEST(test_increment_semaphore_available);
+        RUN_TEST(test_deadlock);
         sleep_ms(5000);
         UNITY_END();
     }
