@@ -20,12 +20,10 @@ void two_locks(void *args)
 {
     struct DeadArgs *dead_args = (struct DeadArgs *)args;
 
-    if (xSemaphoreTake(dead_args->a, portMAX_DELAY) == pdFALSE)
-        return pdFALSE;
+    xSemaphoreTake(dead_args->a, portMAX_DELAY);
     {
         vTaskDelay(100);
-        if (xSemaphoreTake(dead_args->b, portMAX_DELAY) == pdFALSE)
-            return pdFALSE;
+        xSemaphoreTake(dead_args->b, portMAX_DELAY);
         {
             (dead_args->counter)++;
             printf("Obtained both locks! count %d",  dead_args->counter);

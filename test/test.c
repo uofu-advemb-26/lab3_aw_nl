@@ -88,10 +88,10 @@ void test_deadlock(void)
     struct DeadArgs right_args = {right_lock, left_lock, 2};
 
 
-    xTaskCreate(two_locks, "DeadlockThread1",
-            MAIN_TASK_STACK_SIZE, &left_args, DEAD_TASK_PRIORITY, &left_thread);
-    xTaskCreate(two_locks, "DeadlockThread2",
-            MAIN_TASK_STACK_SIZE, &right_args, DEAD_TASK_PRIORITY, &right_thread);
+    xTaskCreate(two_locks, "Left",
+            MAIN_TASK_STACK_SIZE, (void *)&left_args, DEAD_TASK_PRIORITY, &left_thread);
+    xTaskCreate(two_locks, "Right",
+            MAIN_TASK_STACK_SIZE, (void *)&right_args, DEAD_TASK_PRIORITY, &right_thread);
 
     printf("created threads");
 
