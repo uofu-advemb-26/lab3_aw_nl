@@ -21,6 +21,7 @@ int two_locks(int *count, SemaphoreHandle_t lock_a, SemaphoreHandle_t lock_b, Ti
     if (xSemaphoreTake(lock_a, timeout) == pdFALSE)
         return pdFALSE;
     {
+        vTaskDelay(100);
         if (xSemaphoreTake(lock_b, timeout) == pdFALSE)
             return pdFALSE;
         {
@@ -30,4 +31,6 @@ int two_locks(int *count, SemaphoreHandle_t lock_a, SemaphoreHandle_t lock_b, Ti
         xSemaphoreGive(lock_b);
     }   
     xSemaphoreGive(lock_a);
+    vTaskSuspend(NULL);
+    return pdTRUE;
 }
