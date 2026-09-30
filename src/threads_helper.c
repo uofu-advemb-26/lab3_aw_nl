@@ -2,14 +2,16 @@
 #include <semphr.h>
 #include <task.h>
 #include <threads.h>
+#include <stdio.h>
 
-int inc_counter(int *count, SemaphoreHandle_t semaphore)
+int inc_counter(int *count, SemaphoreHandle_t semaphore, TickType_t timeout, const char* msg)
 {
-    int new_count;
-    xSemaphoreTake(semaphore, portMAX_DELAY);
+    if (xSemaphoreTake(semaphore, timeout) == pdFALSE) 
+        return pdFALSE;
     {
-        new_count = *count += 1;
+        (*count)++;
+        printf("HELLO WORLD FROM %s: count %d", msg,  *count);
     }
     xSemaphoreGive(semaphore);
-    return new_count;
+    return pdTRUE;
 }
