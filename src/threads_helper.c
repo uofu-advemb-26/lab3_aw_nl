@@ -16,21 +16,23 @@ int inc_counter(int *count, SemaphoreHandle_t semaphore, TickType_t timeout, con
     return pdTRUE;
 }
 
-int two_locks(int *count, SemaphoreHandle_t lock_a, SemaphoreHandle_t lock_b, TickType_t timeout)
+int two_locks(void *args)
 {
-    if (xSemaphoreTake(lock_a, timeout) == pdFALSE)
+    struct DeadArgs *dead_args = (struct DeadArgs *)args;
+
+    if (xSemaphoreTake(dead_args->a, portMAX_DELAY) == pdFALSE)
         return pdFALSE;
     {
         vTaskDelay(100);
-        if (xSemaphoreTake(lock_b, timeout) == pdFALSE)
+        if (xSemaphoreTake(dead_args->b, portMAX_DELAY) == pdFALSE)
             return pdFALSE;
         {
-            (*count)++;
-            printf("Obtained both locks! count %d",  *count);
+            (dead_args->counter)++;
+            printf("Obtained both locks! count %d",  dead_args->counter);
         }
-        xSemaphoreGive(lock_b);
+        xSemaphoreGive(dead_args->b);
     }   
-    xSemaphoreGive(lock_a);
+    xSemaphoreGive(dead_args->a);
     vTaskSuspend(NULL);
     return pdTRUE;
 }
