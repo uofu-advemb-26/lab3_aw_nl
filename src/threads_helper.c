@@ -15,3 +15,19 @@ int inc_counter(int *count, SemaphoreHandle_t semaphore, TickType_t timeout, con
     xSemaphoreGive(semaphore);
     return pdTRUE;
 }
+
+int two_locks(int *count, SemaphoreHandle_t lock_a, SemaphoreHandle_t lock_b, TickType_t timeout)
+{
+    if (xSemaphoreTake(lock_a, timeout) == pdFALSE)
+        return pdFALSE;
+    {
+        if (xSemaphoreTake(lock_b, timeout) == pdFALSE)
+            return pdFALSE;
+        {
+            (*count)++;
+            printf("Obtained both locks! count %d",  *count);
+        }
+        xSemaphoreGive(lock_b);
+    }   
+    xSemaphoreGive(lock_a);
+}
