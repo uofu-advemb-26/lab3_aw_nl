@@ -43,7 +43,7 @@ int orphaned_lock(int *counter, SemaphoreHandle_t semaphore, TickType_t timeout)
         if (*counter % 2) {
             return 0;
         }
-        printf("Count %d\n", counter);
+        printf("Count %d\n", *counter);
     }
     xSemaphoreGive(semaphore);
     return pdTRUE;
@@ -56,9 +56,8 @@ int unorphaned_lock(int *counter, SemaphoreHandle_t semaphore, TickType_t timeou
     {
         (*counter)++;
         if (!(*counter % 2)) {
-            return 0;
+            printf("Count %d\n", *counter);
         }
-        printf("Count %d\n", counter);
     }
     xSemaphoreGive(semaphore);
     return pdTRUE;
