@@ -112,6 +112,51 @@ void test_deadlock(void)
     printf("done");
 }
 
+
+void test_orphaned(void)
+{
+
+    int counter = 1;
+    SemaphoreHandle_t semaphore = xSemaphoreCreateCounting(1,1);
+
+    int result = orphaned_lock(&counter, semaphore, 1000);
+    TEST_ASSERT_EQUAL_INT(pdTRUE, result);
+    TEST_ASSERT_EQUAL_INT(1, uxSemaphoreGetCount(semaphore));
+    TEST_ASSERT_EQUAL_INT(2, counter);
+
+    result = orphaned_lock(&counter, semaphore, 1000);
+    TEST_ASSERT_EQUAL_INT(pdFALSE, result);
+    TEST_ASSERT_EQUAL_INT(0, uxSemaphoreGetCount(semaphore));
+    TEST_ASSERT_EQUAL_INT(3, counter);
+
+    result = orphaned_lock(&counter, semaphore, 1000);
+    TEST_ASSERT_EQUAL_INT(pdFALSE, result);
+    TEST_ASSERT_EQUAL_INT(0, uxSemaphoreGetCount(semaphore));
+    TEST_ASSERT_EQUAL_INT(3, counter);
+}
+
+void test_unorphaned(void)
+{
+    int counter = 1;
+    SemaphoreHandle_t semaphore = xSemaphoreCreateCounting(1,1);
+
+    int result = unorphaned_lock(&counter, semaphore, 1000);
+    TEST_ASSERT_EQUAL_INT(pdTRUE, result);
+    TEST_ASSERT_EQUAL_INT(1, uxSemaphoreGetCount(semaphore));
+    TEST_ASSERT_EQUAL_INT(2, counter);
+
+    result = unorphaned_lock(&counter, semaphore, 1000);
+    TEST_ASSERT_EQUAL_INT(pdTRUE, result);
+    TEST_ASSERT_EQUAL_INT(1, uxSemaphoreGetCount(semaphore));
+    TEST_ASSERT_EQUAL_INT(3, counter);
+
+    result = unorphaned_lock(&counter, semaphore, 1000);
+    TEST_ASSERT_EQUAL_INT(pdTRUE, result);
+    TEST_ASSERT_EQUAL_INT(1, uxSemaphoreGetCount(semaphore));
+    TEST_ASSERT_EQUAL_INT(4, counter);
+
+}
+
 void main_thread(void *params)
 {
     while (1) {
@@ -125,6 +170,8 @@ void main_thread(void *params)
         RUN_TEST(test_increment_semaphore_taken);
         RUN_TEST(test_increment_semaphore_available);
         RUN_TEST(test_deadlock);
+        RUN_TEST(test_orphaned);
+        RUN_TEST(test_unorphaned);
         sleep_ms(5000);
         UNITY_END();
     }
