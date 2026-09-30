@@ -33,3 +33,33 @@ void two_locks(void *args)
     xSemaphoreGive(dead_args->a);
     vTaskSuspend(NULL);
 }
+
+int orphaned_lock(int *counter, SemaphoreHandle_t semaphore, TickType_t timeout)
+{
+    if (xSemaphoreTake(semaphore, timeout) == pdFALSE)
+        return pdFALSE;
+    {
+        (*counter)++;
+        if (*counter % 2) {
+            return 0;
+        }
+        printf("Count %d\n", counter);
+    }
+    xSemaphoreGive(semaphore);
+    return pdTRUE;
+}
+
+int unorphaned_lock(int *counter, SemaphoreHandle_t semaphore, TickType_t timeout)
+{
+    if (xSemaphoreTake(semaphore, timeout) == pdFALSE)
+        return pdFALSE;
+    {
+        (*counter)++;
+        if (!(*counter % 2)) {
+            return 0;
+        }
+        printf("Count %d\n", counter);
+    }
+    xSemaphoreGive(semaphore);
+    return pdTRUE;
+}
