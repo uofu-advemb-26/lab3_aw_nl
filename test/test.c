@@ -6,6 +6,7 @@
 #include <unity.h>
 #include "unity_config.h"
 #include "threads.h"
+#include "test_helper.h"
 
 #include <FreeRTOS.h>
 #include <semphr.h>
