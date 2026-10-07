@@ -25,26 +25,20 @@ void setUp(void)
 
 void tearDown(void) {}
 
-void test_variable_assignment()
-{
-    int x = 1;
-    TEST_ASSERT_TRUE_MESSAGE(x == 1,"Variable assignment failed.");
-}
-
 void test_main_print(void)
 {        
     SemaphoreHandle_t semaphore = xSemaphoreCreateCounting(1,1);
     int before = counter;
-    inc_counter(&counter, semaphore, 10, "test");
+    inc_counter(&counter, semaphore, 10, "main");
     int after = counter;
-    TEST_ASSERT_TRUE_MESSAGE(after == before + 1, "Side print failed");
+    TEST_ASSERT_TRUE_MESSAGE(after == before + 1, "Main print failed");
 }
 
 void test_side_print(void)
 {
     SemaphoreHandle_t semaphore = xSemaphoreCreateCounting(1,1);
     int before = counter;
-    inc_counter(&counter, semaphore, 10, "test");
+    inc_counter(&counter, semaphore, 10, "side");
     int after = counter;
     TEST_ASSERT_TRUE_MESSAGE(after == before + 1, "Side print failed");
 }
@@ -52,9 +46,7 @@ void test_side_print(void)
 
 void test_increment_semaphore_taken(void)
 {
-
     SemaphoreHandle_t semaphore = xSemaphoreCreateCounting(1,1);
-    int counter = 0;
     xSemaphoreTake(semaphore, portMAX_DELAY);
 
     // call inc count with semaphore taken
@@ -68,7 +60,6 @@ void test_increment_semaphore_available(void)
 {
 
     SemaphoreHandle_t semaphore = xSemaphoreCreateCounting(1,1);
-    int counter = 0;
     // call inc count with semaphore taken
     int result = inc_counter(&counter, semaphore, 10, "test");
 
@@ -164,7 +155,6 @@ void main_thread(void *params)
         sleep_ms(5000); // Give time for TTY to attach.
         printf("Start tests\n");
         UNITY_BEGIN();
-        RUN_TEST(test_variable_assignment);
         RUN_TEST(test_side_print);
         RUN_TEST(test_main_print);
         RUN_TEST(test_increment_semaphore_taken);
